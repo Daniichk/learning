@@ -1,0 +1,19 @@
+{
+  "name": "opening-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "postinstall": "node scripts/copy-stockfish.mjs",
+    "copy:engine": "node scripts/copy-stockfish.mjs"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "stockfish": "^19.0.1"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}

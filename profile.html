@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c110e">
+  <title>Profile | Opening Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #0c110e;
+      --panel: #151d17;
+      --panel-soft: #1b261e;
+      --ink: #f0f3e8;
+      --muted: #9da99c;
+      --line: #2a362d;
+      --lime: #c8ef78;
+      --green: #9fca58;
+      --mono: 'Space Mono', monospace;
+      --sans: 'DM Sans', 'Segoe UI', sans-serif;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: linear-gradient(#ffffff06 1px, transparent 1px), linear-gradient(90deg, #ffffff06 1px, transparent 1px), radial-gradient(ellipse at 50% -28%, #354a342e, transparent 54%);
+      background-size: 48px 48px, 48px 48px, auto;
+      font: 14px var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .shell { width: min(1200px, calc(100% - 64px)); margin: 0 auto; }
+    .topbar { display: flex; min-height: 78px; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff19; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-mark { display: grid; width: 34px; height: 34px; grid-template: 1fr 1fr / 1fr 1fr; overflow: hidden; border: 1px solid #91bb5d; box-shadow: 0 0 24px #c8ef781c; }
+    .brand-mark i:nth-child(1), .brand-mark i:nth-child(4) { background: #527b4c; }
+    .brand-mark i:nth-child(2), .brand-mark i:nth-child(3) { background: var(--lime); }
+    .brand-name { font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+    .brand-name span { color: var(--lime); }
+    .back-link { display: inline-flex; min-height: 36px; align-items: center; gap: 9px; padding: 0 12px; border: 1px solid #ffffff24; background: #ffffff07; color: var(--ink); font-size: 11px; text-decoration: none; transition: border-color 160ms ease, color 160ms ease; }
+    .back-link:hover { border-color: #c8ef7855; color: var(--lime); }
+    .main { padding: 42px 0 70px; animation: appear 450ms cubic-bezier(.2,.8,.2,1) both; }
+    .page-kicker, .section-kicker { margin: 0 0 8px; color: var(--lime); font: 9px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .profile-hero { position: relative; display: grid; min-height: 250px; grid-template-columns: minmax(0, 1fr) 230px; align-items: center; gap: 30px; overflow: hidden; padding: 32px 38px; border: 1px solid #435142; background: radial-gradient(ellipse at 84% 45%, #6f8b3c25, transparent 38%), linear-gradient(115deg, #18231b, #111813 68%); }
+    .profile-hero::after { position: absolute; top: -50%; right: 24%; width: 1px; height: 200%; background: linear-gradient(transparent, #c8ef7826, transparent); content: ''; transform: rotate(28deg); pointer-events: none; }
+    .identity { position: relative; z-index: 1; display: flex; min-width: 0; align-items: center; gap: 22px; }
+    .avatar-wrap { position: relative; flex: 0 0 94px; width: 94px; height: 94px; }
+    .avatar { display: grid; width: 100%; height: 100%; place-items: center; overflow: hidden; border: 1px solid #718651; background: #293829; color: var(--lime); font: 26px var(--mono); object-fit: cover; }
+    .avatar[hidden] { display: none; }
+    .avatar-wrap.has-image .avatar { background: #18211a; }
+    .avatar-edit { position: absolute; right: -7px; bottom: -7px; display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid #526542; background: var(--panel); color: var(--lime); cursor: pointer; transition: transform 160ms ease, background 160ms ease; }
+    .avatar-edit:hover { transform: translateY(-2px); background: #263526; }
+    .avatar-edit svg { width: 15px; height: 15px; }
+    #avatar-file { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+    .identity-copy { min-width: 0; }
+    .identity-copy h1 { overflow-wrap: anywhere; margin: 0; font: 600 clamp(32px, 4vw, 48px)/.98 var(--serif); }
+    .rank-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 11px 0 0; color: var(--muted); font-size: 11px; }
+    .rank-mark { width: 5px; height: 5px; background: var(--lime); transform: rotate(45deg); }
+    .rating { position: relative; z-index: 1; display: grid; justify-items: start; gap: 4px; padding-left: 25px; border-left: 1px solid #38443a; }
+    .rating-label { color: #a4b09f; font: 9px var(--mono); }
+    .rating strong { color: var(--lime); font: 500 64px/.9 var(--serif); font-variant-numeric: tabular-nums; transform-origin: left center; }
+    .rating-change { color: #a7ba8a; font-size: 10px; }
+    .summary { display: grid; grid-template-columns: repeat(5, 1fr); margin: 0 0 38px; border-bottom: 1px solid #ffffff20; }
+    .summary-item { display: flex; min-height: 82px; align-items: center; gap: 12px; border-right: 1px solid #ffffff12; }
+    .summary-item:not(:first-child) { padding-left: 20px; }
+    .summary-item:last-child { border-right: 0; }
+    .summary-item strong { color: var(--lime); font: 22px var(--mono); }
+    .summary-item span { color: var(--muted); font: 8px var(--mono); }
+    .content-grid { display: grid; grid-template-columns: minmax(250px, .7fr) minmax(0, 1.5fr); gap: 48px; align-items: start; }
+    .settings { padding-right: 34px; border-right: 1px solid #ffffff20; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+    .section-heading h2 { margin: 0; font: 600 26px/1 var(--serif); }
+    .form-label { display: block; margin: 17px 0 8px; color: var(--muted); font-size: 11px; }
+    .name-row { display: flex; gap: 7px; }
+    .name-row input, .theme-select { width: 100%; min-width: 0; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 0; outline: 0; background: #101612; color: var(--ink); font-size: 12px; }
+    .name-row input:focus, .theme-select:focus { border-color: var(--lime); box-shadow: 0 0 0 2px #c8ef781c; }
+    .save-button { min-width: 68px; border: 0; background: var(--lime); color: #172019; cursor: pointer; font-size: 11px; font-weight: 700; }
+    .save-button:hover { background: #d7f694; }
+    .clear-photo { margin-top: 11px; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
+    .clear-photo:hover { color: var(--lime); }
+    .clear-photo[hidden] { display: none; }
+    .feedback { min-height: 16px; margin: 7px 0 0; color: var(--lime); font-size: 10px; }
+    .profile-note { display: flex; align-items: start; gap: 10px; margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .note-icon { display: grid; flex: 0 0 18px; width: 18px; height: 18px; place-items: center; border: 1px solid #61764b; border-radius: 50%; color: var(--lime); font: 10px var(--mono); }
+    .achievements { min-width: 0; }
+    .achievement-count { color: var(--muted); font: 10px var(--mono); }
+    .achievement-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px 12px; margin: 0 0 14px; }
+    .achievement-progress label, .achievement-progress output { color: var(--muted); font-size: 10px; }
+    .achievement-progress progress { grid-column: 1 / -1; width: 100%; height: 8px; appearance: none; border: 0; border-radius: 99px; background: var(--line); }
+    .achievement-progress progress::-webkit-progress-bar { border-radius: 99px; background: var(--line); }
+    .achievement-progress progress::-webkit-progress-value { border-radius: 99px; background: linear-gradient(90deg, #85b54a, var(--lime)); transition: width 500ms ease; }
+    .achievement-progress progress::-moz-progress-bar { border-radius: 99px; background: linear-gradient(90deg, #85b54a, var(--lime)); }
+    .achievement-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .achievement { min-width: 0; overflow: hidden; border: 1px solid var(--line); background: #141c16; perspective: 700px; transition: border-color 180ms ease, transform 180ms ease; }
+    .achievement:not(.locked) { animation: achievement-unlock 650ms cubic-bezier(.2,.8,.2,1) both; }
+    .achievement:hover { transform: translateY(-3px); border-color: #657b4b; }
+    .achievement-art { position: relative; display: grid; height: 126px; place-items: center; overflow: hidden; perspective: 500px; background: radial-gradient(ellipse at 50% 63%, #354330, #202920 42%, #171e19 78%); }
+    .achievement-art::before, .achievement-art::after { position: absolute; width: 74px; height: 74px; border: 1px solid #c8ef7850; border-radius: 50%; content: ''; transform: rotateX(68deg); animation: badge-orbit 8s linear infinite; }
+    .achievement-art::after { width: 98px; height: 98px; border-color: #c8ef7824; animation-direction: reverse; animation-duration: 13s; }
+    .achievement-art img { position: relative; z-index: 1; width: 68px; height: 68px; object-fit: contain; filter: drop-shadow(0 13px 10px #0009); transform: rotateY(-14deg) rotateX(8deg) translateZ(24px); animation: badge-float 3s ease-in-out infinite alternate; transition: transform 180ms ease, filter 180ms ease; }
+    .achievement:hover .achievement-art img, .achievement:focus-within .achievement-art img { transform: rotateY(0) rotateX(0) translateY(-7px) translateZ(34px) scale(1.1); }
+    .achievement.locked .achievement-art { background: radial-gradient(ellipse at 50% 63%, #252b25, #1b211c 52%, #171e19 82%); }
+    .achievement.locked .achievement-art img { opacity: .4; filter: grayscale(.8); }
+    .lock { position: absolute; top: 8px; right: 8px; display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid #4a564b; border-radius: 50%; background: #171e19; color: #9ba69b; font-size: 10px; }
+    .achievement-copy { min-height: 76px; padding: 10px; border-top: 1px solid var(--line); }
+    .achievement-copy h3 { margin: 0; font-size: 11px; font-weight: 600; }
+    .achievement-copy p { margin: 5px 0 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .trophy { perspective: 600px; transition: transform 200ms ease, border-color 200ms ease; }
+    .trophy:hover { transform: translateY(-3px) rotateX(3deg); border-color: #657b4b; }
+    .trophy-icon img { filter: drop-shadow(0 6px 5px #0009); transform: rotateY(-16deg); animation: badge-float 2.8s ease-in-out infinite alternate; }
+    @keyframes badge-float { from { translate: 0 3px; } to { translate: 0 -5px; } }
+    @keyframes badge-orbit { from { rotate: 0deg; } to { rotate: 360deg; } }
+    @keyframes achievement-unlock { from { opacity: .6; box-shadow: 0 0 24px #c8ef7840; } to { opacity: 1; box-shadow: 0 0 0 transparent; } }
+    @keyframes rating-pop { 0% { opacity: .65; transform: scale(.88); text-shadow: 0 0 0 transparent; } 55% { opacity: 1; transform: scale(1.12); text-shadow: 0 0 22px #c8ef7880; } 100% { transform: scale(1); } }
+    .rating strong.is-animating { animation: rating-pop 650ms cubic-bezier(.2,.8,.2,1); }
+    .trophies { margin-top: 40px; padding-top: 23px; border-top: 1px solid #ffffff20; }
+    .trophy-count { color: var(--muted); font: 10px var(--mono); }
+    .trophy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .trophy { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 65px; padding: 10px; border: 1px solid var(--line); background: #141c16; }
+    .trophy-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid #566846; border-radius: 50%; background: #303d2b; color: var(--lime); }
+    .trophy-icon img { width: 23px; height: 23px; object-fit: contain; }
+    .trophy h3 { margin: 0; font-size: 11px; }
+    .trophy p { margin: 4px 0 0; color: var(--muted); font-size: 9px; }
+    .trophy-date { color: var(--muted); font: 8px var(--mono); white-space: nowrap; }
+    .empty-state { grid-column: 1 / -1; padding: 20px; border: 1px dashed #3b473e; color: var(--muted); font-size: 11px; line-height: 1.55; text-align: center; }
+    body[data-theme="light"] { color-scheme: light; --paper: #eff2eb; --panel: #fff; --panel-soft: #e7eee2; --ink: #1d2921; --muted: #64746a; --line: #d7ded6; --lime: #65893d; --green: #456b38; background-color: var(--paper); background-image: linear-gradient(#364a3810 1px, transparent 1px), linear-gradient(90deg, #364a3810 1px, transparent 1px), radial-gradient(ellipse at 50% -28%, #cbd9c33d, transparent 54%); }
+    body[data-theme="light"] .topbar, body[data-theme="light"] .summary, body[data-theme="light"] .settings, body[data-theme="light"] .trophies { border-color: var(--line); }
+    body[data-theme="light"] .profile-hero { border-color: var(--line); background: radial-gradient(ellipse at 84% 45%, #91b56e28, transparent 38%), linear-gradient(115deg, #fff, #edf3e9 68%); }
+    body[data-theme="light"] .rating { border-color: var(--line); }
+    body[data-theme="light"] .avatar { border-color: #c8d8ba; background: #e4eed7; color: #456b38; }
+    body[data-theme="light"] .name-row input, body[data-theme="light"] .theme-select { border-color: var(--line); background: #fff; color: var(--ink); }
+    body[data-theme="light"] .achievement, body[data-theme="light"] .trophy { background: #fff; }
+    body[data-theme="light"] .achievement-art { background: radial-gradient(ellipse at 50% 63%, #dce9d0, #f0f3ed 74%); }
+    body[data-theme="light"] .achievement.locked .achievement-art { background: radial-gradient(ellipse at 50% 63%, #dfe4dc, #f0f3ed 74%); }
+    body[data-theme="light"] .achievement-art img { filter: drop-shadow(0 8px 8px #34423038); }
+    body[data-theme="moss"] { --lime: #e6bf67; --green: #b38a3b; }
+    body[data-theme="moss"] .profile-hero { background: radial-gradient(ellipse at 84% 45%, #a2854824, transparent 38%), linear-gradient(115deg, #211f18, #171a16 68%); }
+    body[data-theme="moss"] .avatar { border-color: #806b3c; color: #e6bf67; }
+    @keyframes appear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 240px minmax(0, 1fr); gap: 28px; }
+      .settings { padding-right: 22px; }
+      .achievement-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .achievement-art { height: 112px; }
+    }
+    @media (max-width: 650px) {
+      .shell { width: calc(100% - 32px); }
+      .topbar { min-height: 66px; }
+      .main { padding-top: 24px; }
+      .profile-hero { min-height: 0; grid-template-columns: 1fr auto; gap: 18px; padding: 22px 18px; }
+      .identity { gap: 13px; }
+      .avatar-wrap { flex-basis: 62px; width: 62px; height: 62px; }
+      .avatar { font-size: 18px; }
+      .avatar-edit { width: 27px; height: 27px; }
+      .identity-copy h1 { font-size: 31px; }
+      .rating { gap: 3px; padding-left: 12px; }
+      .rating strong { font-size: 41px; }
+      .rating-label { font-size: 7px; }
+      .summary { grid-template-columns: repeat(3, 1fr); margin-bottom: 29px; }
+      .summary-item { min-height: 66px; gap: 7px; border-right: 0; }
+      .summary-item:not(:first-child) { padding-left: 0; }
+      .summary-item strong { font-size: 17px; }
+      .summary-item span { font-size: 7px; }
+      .content-grid { grid-template-columns: 1fr; gap: 28px; }
+      .settings { padding: 0 0 24px; border-right: 0; border-bottom: 1px solid #ffffff20; }
+      .achievement-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .achievement-art { height: 100px; }
+      .trophy-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 380px) {
+      .shell { width: calc(100% - 24px); }
+      .profile-hero { grid-template-columns: 1fr; }
+      .rating { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 5px 10px; padding: 10px 0 0; border-top: 1px solid #ffffff20; border-left: 0; }
+      .rating-label { grid-column: 1 / -1; }
+      .rating strong { font-size: 33px; }
+      .summary-item { display: grid; align-content: center; gap: 3px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar shell">
+    <a class="brand" href="./learning.html" aria-label="Opening Lab home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="brand-name">OPENING <span>LAB</span></span>
+    </a>
+    <a class="back-link" href="./learning.html"><span aria-hidden="true">←</span> Back to learning</a>
+  </header>
+  <main class="main shell">
+    <p class="page-kicker">LEARNER PROFILE</p>
+    <section class="profile-hero" aria-labelledby="profile-name">
+      <div class="identity">
+        <div class="avatar-wrap" id="avatar-wrap">
+          <div class="avatar" id="avatar-fallback" aria-hidden="true">OP</div>
+          <img class="avatar" id="avatar-image" alt="Profile photo" hidden>
+          <label class="avatar-edit" for="avatar-file" title="Change profile photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+          </label>
+          <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Choose a profile photo">
+        </div>
+        <div class="identity-copy">
+          <p class="section-kicker">YOUR LEARNING SPACE</p>
+          <h1 id="profile-name">Opening Learner</h1>
+          <p class="rank-line"><span class="rank-mark" aria-hidden="true"></span><span id="profile-rank">Learner</span><span id="placement-note"></span></p>
+        </div>
+      </div>
+      <div class="rating"><span class="rating-label">CURRENT SKILL</span><strong id="profile-rating">400</strong><span class="rating-change" id="rating-change">+0 after last session</span></div>
+    </section>
+
+    <section class="summary" aria-label="Player statistics">
+      <div class="summary-item"><strong id="wins">0</strong><span>SUCCESSES</span></div>
+      <div class="summary-item"><strong id="losses">0</strong><span>RETRIES</span></div>
+      <div class="summary-item"><strong id="draws">0</strong><span>TIES</span></div>
+      <div class="summary-item"><strong id="games">0</strong><span>SESSIONS</span></div>
+      <div class="summary-item"><strong id="openings-learned">0</strong><span>LESSONS</span></div>
+    </section>
+
+    <div class="content-grid">
+      <section class="settings" aria-labelledby="settings-title">
+        <div class="section-heading"><div><p class="section-kicker">MAKE IT YOURS</p><h2 id="settings-title">Profile settings</h2></div></div>
+        <form id="profile-form">
+          <label class="form-label" for="player-name">Display name</label>
+          <div class="name-row"><input id="player-name" type="text" maxlength="24" autocomplete="name" placeholder="Your name" required><button class="save-button" type="submit">Save</button></div>
+          <p class="feedback" id="settings-feedback" aria-live="polite"></p>
+        </form>
+        <button class="clear-photo" id="clear-photo" type="button" hidden>Remove profile photo</button>
+        <label class="form-label" for="theme-select">Learning space theme</label>
+        <select id="theme-select" class="theme-select"><option value="dark">Carbon / lime</option><option value="light">Paper / forest</option><option value="moss">Moss / gold</option></select>
+        <div class="profile-note"><span class="note-icon" aria-hidden="true">i</span><span>Your skill rating updates after each practice session. The first 30 sessions help set your starting level.</span></div>
+      </section>
+
+      <section class="achievements" aria-labelledby="achievements-title">
+        <div class="section-heading"><div><p class="section-kicker">YOUR LEARNING MILESTONES</p><h2 id="achievements-title">Achievements</h2></div><span class="achievement-count" id="achievement-count">0 / 21</span></div>
+        <div class="achievement-progress"><label for="achievement-progress">Achievement progress</label><output id="achievement-progress-label" for="achievement-progress">0 / 21</output><progress id="achievement-progress" max="21" value="0">0 / 21</progress></div>
+        <div class="achievement-grid" id="achievement-grid"></div>
+      </section>
+    </div>
+
+    <section class="trophies" aria-labelledby="trophies-title">
+      <div class="section-heading"><div><p class="section-kicker">PROGRESS WORTH CELEBRATING</p><h2 id="trophies-title">Milestone collection</h2></div><span class="trophy-count" id="trophy-count">0 milestones</span></div>
+      <div class="trophy-list" id="trophy-list"></div>
+    </section>
+  </main>
+
+  <script>
+    const settingsKey = 'opening-lab-profile-settings-v1';
+    const recordKey = 'opening-lab-bot-record-v1';
+    const progressKey = 'debyutnaya-progress-v1';
+    const fallbackSettings = { name: 'Opening Learner', theme: 'dark', showMoveTips: false, avatar: '' };
+
+    function readStorage(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value && typeof value === 'object' ? value : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    const storedSettings = readStorage(settingsKey, fallbackSettings);
+    const profile = {
+      name: typeof storedSettings.name === 'string' && storedSettings.name.trim() ? storedSettings.name.trim().slice(0, 24) : fallbackSettings.name,
+      theme: ['dark', 'light', 'moss'].includes(storedSettings.theme) ? storedSettings.theme : 'dark',
+      showMoveTips: storedSettings.showMoveTips === true,
+      avatar: typeof storedSettings.avatar === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(storedSettings.avatar) ? storedSettings.avatar : ''
+    };
+    const storedRecord = readStorage(recordKey, {});
+    const record = {
+      gamesPlayed: Math.max(0, Number(storedRecord.gamesPlayed) || 0),
+      wins: Math.max(0, Number(storedRecord.wins) || 0),
+      losses: Math.max(0, Number(storedRecord.losses) || 0),
+      draws: Math.max(0, Number(storedRecord.draws) || 0),
+      rating: Number.isFinite(Number(storedRecord.rating)) ? Math.max(100, Number(storedRecord.rating)) : 400,
+      lastRatingChange: Number(storedRecord.lastRatingChange) || 0,
+      trophies: Array.isArray(storedRecord.trophies) ? storedRecord.trophies : []
+    };
+    let ratingAnimationFrame = null;
+
+    function initials(name) {
+      return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'OP';
+    }
+
+    function rankFor(rating) {
+      if (rating > 2000) return 'GM · Grandmaster';
+      if (rating > 1500) return 'IM · International Master';
+      if (rating > 1000) return 'FM · FIDE Master';
+      if (rating > 500) return 'BM · Beginner Master';
+      return 'Learner';
+    }
+
+    function animateRating(element, rating) {
+      if (ratingAnimationFrame !== null) window.cancelAnimationFrame(ratingAnimationFrame);
+      const start = Number(element.textContent) || 400;
+      if (start === rating || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        element.textContent = rating;
+        return;
+      }
+      const startedAt = performance.now();
+      const duration = 850;
+      element.classList.remove('is-animating');
+      void element.offsetWidth;
+      element.classList.add('is-animating');
+      const update = (now) => {
+        const ratio = Math.min(1, (now - startedAt) / duration);
+        const eased = 1 - (1 - ratio) ** 3;
+        element.textContent = Math.round(start + (rating - start) * eased);
+        if (ratio < 1) ratingAnimationFrame = window.requestAnimationFrame(update);
+        else {
+          element.textContent = rating;
+          ratingAnimationFrame = null;
+        }
+      };
+      ratingAnimationFrame = window.requestAnimationFrame(update);
+    }
+
+    function saveProfile() {
+      try {
+        localStorage.setItem(settingsKey, JSON.stringify(profile));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function renderAvatar() {
+      const fallback = document.getElementById('avatar-fallback');
+      const image = document.getElementById('avatar-image');
+      const wrap = document.getElementById('avatar-wrap');
+      fallback.textContent = initials(profile.name);
+      image.hidden = !profile.avatar;
+      fallback.hidden = Boolean(profile.avatar);
+      wrap.classList.toggle('has-image', Boolean(profile.avatar));
+      if (profile.avatar) image.src = profile.avatar;
+      document.getElementById('clear-photo').hidden = !profile.avatar;
+    }
+
+    function achievementDefinitions(learningProgress) {
+      const strongestWin = record.trophies.reduce((highest, trophy) => Math.max(highest, Number(trophy.elo) || 0), 0);
+      const learned = Array.isArray(learningProgress.learned)
+        ? learningProgress.learned.filter((entry) => typeof entry === 'string' && entry.includes(':'))
+        : [];
+      const uniqueOpenings = new Set(learned.map((entry) => entry.split(':')[0])).size;
+      const hasLearnedBothSides = new Set(learned.map((entry) => entry.split(':')[1])).size >= 2;
+      return [
+        { title: 'First Breakthrough', description: 'Win your first session against the AI tutor.', piece: 'N-white.svg', unlocked: record.wins >= 1 },
+        { title: 'Five Victories', description: 'Win five sessions against the AI tutor.', piece: 'P-white.svg', unlocked: record.wins >= 5 },
+        { title: 'Ten Victories', description: 'Win ten sessions against the AI tutor.', piece: 'B-white.svg', unlocked: record.wins >= 10 },
+        { title: 'First Session', description: 'Complete your first practice session.', piece: 'N-white.svg', unlocked: record.gamesPlayed >= 1 },
+        { title: 'Practice Habit', description: 'Complete five practice sessions.', piece: 'P-white.svg', unlocked: record.gamesPlayed >= 5 },
+        { title: 'Dedicated Learner', description: 'Complete 25 practice sessions.', piece: 'B-white.svg', unlocked: record.gamesPlayed >= 25 },
+        { title: 'Century of Study', description: 'Complete 100 practice sessions.', piece: 'Q-white.svg', unlocked: record.gamesPlayed >= 100 },
+        { title: 'Opening Explorer', description: 'Complete a lesson in your first opening.', piece: 'N-white.svg', unlocked: uniqueOpenings >= 1 },
+        { title: 'Five-Opening Explorer', description: 'Complete lessons in five different openings.', piece: 'P-white.svg', unlocked: uniqueOpenings >= 5 },
+        { title: 'Ten-Opening Explorer', description: 'Complete lessons in ten different openings.', piece: 'B-white.svg', unlocked: uniqueOpenings >= 10 },
+        { title: 'Opening Scholar', description: 'Complete lessons in all 18 openings.', piece: 'Q-white.svg', unlocked: uniqueOpenings >= 18 },
+        { title: 'Five Lesson Lines', description: 'Complete five opening lines.', piece: 'N-white.svg', unlocked: learned.length >= 5 },
+        { title: 'Ten Lesson Lines', description: 'Complete ten opening lines.', piece: 'P-white.svg', unlocked: learned.length >= 10 },
+        { title: 'Twenty-Five Lesson Lines', description: 'Complete 25 opening lines.', piece: 'B-white.svg', unlocked: learned.length >= 25 },
+        { title: 'Both-Sides Student', description: 'Complete opening lessons as White and Black.', piece: 'R-white.svg', unlocked: hasLearnedBothSides },
+        { title: 'BM Rank', description: 'Reach a rating above 500.', piece: 'P-white.svg', unlocked: record.rating > 500 },
+        { title: 'FM Rank', description: 'Reach a rating above 1,000.', piece: 'B-white.svg', unlocked: record.rating > 1000 },
+        { title: 'IM Rank', description: 'Reach a rating above 1,500.', piece: 'R-white.svg', unlocked: record.rating > 1500 },
+        { title: 'GM Rank', description: 'Reach a rating above 2,000.', piece: 'Q-white.svg', unlocked: record.rating > 2000 },
+        { title: 'First Draw', description: 'Finish your first even-scoring session.', piece: 'B-white.svg', unlocked: record.draws >= 1 },
+        { title: 'Challenge Champion', description: 'Win a session at level 2,000 or higher.', piece: 'Q-white.svg', unlocked: strongestWin >= 2000 }
+      ];
+    }
+
+    function renderAchievements(learningProgress) {
+      const achievements = achievementDefinitions(learningProgress);
+      const grid = document.getElementById('achievement-grid');
+      const unlockedCount = achievements.filter((item) => item.unlocked).length;
+      document.getElementById('achievement-count').textContent = unlockedCount + ' / ' + achievements.length;
+      const achievementProgress = document.getElementById('achievement-progress');
+      achievementProgress.max = achievements.length;
+      achievementProgress.value = unlockedCount;
+      document.getElementById('achievement-progress-label').textContent = unlockedCount + ' / ' + achievements.length;
+      grid.replaceChildren();
+      for (const achievement of achievements) {
+        const card = document.createElement('article');
+        card.className = 'achievement' + (achievement.unlocked ? '' : ' locked');
+        const art = document.createElement('div');
+        art.className = 'achievement-art';
+        const image = document.createElement('img');
+        image.src = './pieces/' + achievement.piece;
+        image.alt = '';
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        art.append(image);
+        if (!achievement.unlocked) {
+          const lock = document.createElement('span');
+          lock.className = 'lock';
+          lock.textContent = '◇';
+          art.append(lock);
+        }
+        const copy = document.createElement('div');
+        copy.className = 'achievement-copy';
+        const title = document.createElement('h3');
+        title.textContent = achievement.title;
+        const description = document.createElement('p');
+        description.textContent = achievement.description;
+        copy.append(title, description);
+        card.append(art, copy);
+        grid.append(card);
+      }
+    }
+
+    function renderTrophies() {
+      const list = document.getElementById('trophy-list');
+      list.replaceChildren();
+      const trophies = [...record.trophies].reverse();
+      document.getElementById('trophy-count').textContent = trophies.length + (trophies.length === 1 ? ' milestone' : ' milestones');
+      if (!trophies.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'Your first milestone is waiting. Complete a guided practice challenge to earn it.';
+        list.append(empty);
+        return;
+      }
+      for (const trophy of trophies) {
+        const item = document.createElement('article');
+        item.className = 'trophy';
+        const icon = document.createElement('span');
+        icon.className = 'trophy-icon';
+        const image = document.createElement('img');
+        image.src = './pieces/trophy.svg';
+        image.alt = '';
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        icon.append(image);
+        const copy = document.createElement('div');
+        const title = document.createElement('h3');
+        title.textContent = trophy.title || 'Progress milestone';
+        const detail = document.createElement('p');
+        detail.textContent = 'Challenge level ' + (Number(trophy.elo) || 0);
+        copy.append(title, detail);
+        const date = document.createElement('time');
+        date.className = 'trophy-date';
+        if (trophy.date) {
+          date.dateTime = trophy.date;
+          date.textContent = new Date(trophy.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        item.append(icon, copy, date);
+        list.append(item);
+      }
+    }
+
+    function render() {
+      document.body.dataset.theme = profile.theme;
+      document.getElementById('profile-name').textContent = profile.name;
+      document.getElementById('player-name').value = profile.name;
+      document.getElementById('theme-select').value = profile.theme;
+      document.getElementById('profile-rank').textContent = rankFor(record.rating);
+      document.getElementById('placement-note').textContent = record.gamesPlayed < 30 ? '· ' + (30 - record.gamesPlayed) + ' level-setting sessions left' : '';
+      animateRating(document.getElementById('profile-rating'), record.rating);
+      document.getElementById('rating-change').textContent = (record.lastRatingChange > 0 ? '+' : '') + record.lastRatingChange + ' after last session';
+      document.getElementById('wins').textContent = record.wins;
+      document.getElementById('losses').textContent = record.losses;
+      document.getElementById('draws').textContent = record.draws;
+      document.getElementById('games').textContent = record.gamesPlayed;
+      const progress = readStorage(progressKey, {});
+      const learned = Array.isArray(progress.learned)
+        ? progress.learned.filter((entry) => typeof entry === 'string' && entry.includes(':'))
+        : [];
+      document.getElementById('openings-learned').textContent = new Set(learned.map((entry) => entry.split(':')[0])).size;
+      renderAvatar();
+      renderAchievements(progress);
+      renderTrophies();
+    }
+
+    function readAsDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Could not read the image.'));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function prepareAvatar(file) {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Choose a JPG, PNG, or WebP image.');
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 512 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Your browser could not process this image.');
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close();
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', .84));
+      if (!blob) throw new Error('Your browser could not process this image.');
+      return readAsDataUrl(blob);
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('player-name').value.trim();
+      const feedback = document.getElementById('settings-feedback');
+      if (!name) {
+        feedback.textContent = 'Enter a name to save your profile.';
+        return;
+      }
+      profile.name = name.slice(0, 24);
+      feedback.textContent = saveProfile() ? 'Profile saved.' : 'Could not save your profile in this browser.';
+      renderAvatar();
+      document.getElementById('profile-name').textContent = profile.name;
+    });
+
+    document.getElementById('avatar-file').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const feedback = document.getElementById('settings-feedback');
+      const previousAvatar = profile.avatar;
+      feedback.textContent = 'Preparing photo…';
+      try {
+        profile.avatar = await prepareAvatar(file);
+        if (!saveProfile()) throw new Error('Photo is too large to save in this browser.');
+        feedback.textContent = 'Profile photo saved.';
+        renderAvatar();
+      } catch (error) {
+        profile.avatar = previousAvatar;
+        feedback.textContent = error instanceof Error ? error.message : 'Could not save this photo.';
+      }
+      event.target.value = '';
+    });
+
+    document.getElementById('clear-photo').addEventListener('click', () => {
+      profile.avatar = '';
+      const feedback = document.getElementById('settings-feedback');
+      feedback.textContent = saveProfile() ? 'Profile photo removed.' : 'Could not save this change.';
+      renderAvatar();
+    });
+
+    document.getElementById('theme-select').addEventListener('change', (event) => {
+      profile.theme = event.target.value;
+      document.body.dataset.theme = profile.theme;
+      document.getElementById('settings-feedback').textContent = saveProfile() ? 'Theme saved.' : 'Could not save this change.';
+    });
+
+    render();
+  </script>
+</body>
+</html>

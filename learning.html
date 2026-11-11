@@ -284,7 +284,7 @@
     .mode-button, .profile-button {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       min-height: 36px; padding: 0 12px; border: 1px solid transparent; border-radius: 5px;
-      background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600;
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none;
     }
     .mode-button[aria-pressed="true"] { border-color: #39483c; background: #1b241e; color: var(--ink); }
     .mode-button:hover, .profile-button:hover { border-color: #39483c; color: var(--ink); }
@@ -642,9 +642,9 @@
           <strong id="daily-count">0 / 5</strong>
         </div>
         <nav class="mode-nav" aria-label="Learning navigation">
-          <button class="mode-button" id="train-mode-button" type="button" aria-pressed="true" aria-current="page">Learn</button>
-          <button class="mode-button" id="openings-mode-button" type="button" aria-pressed="false">Lessons</button>
-          <button class="mode-button" id="play-mode-button" type="button" aria-pressed="false">Practice</button>
+          <a class="mode-button" id="train-mode-button" href="#train" aria-current="page">Learn</a>
+          <a class="mode-button" id="openings-mode-button" href="#openings">Lessons</a>
+          <a class="mode-button" id="play-mode-button" href="#play">Practice</a>
         </nav>
         <a class="profile-button" id="profile-button" href="./profile.html" aria-label="Open profile">
           <span class="header-avatar" id="header-avatar" aria-hidden="true">OP</span>
@@ -1382,9 +1382,6 @@
       document.getElementById('workspace').classList.toggle('openings-mode', browsingOpenings);
       document.getElementById('training-panel').hidden = playing;
       document.getElementById('game-panel').hidden = !playing;
-      document.getElementById('train-mode-button').setAttribute('aria-pressed', String(mode === 'train'));
-      document.getElementById('openings-mode-button').setAttribute('aria-pressed', String(browsingOpenings));
-      document.getElementById('play-mode-button').setAttribute('aria-pressed', String(playing));
       document.getElementById('train-mode-button').setAttribute('aria-current', String(mode === 'train' ? 'page' : 'false'));
       document.getElementById('openings-mode-button').setAttribute('aria-current', String(browsingOpenings ? 'page' : 'false'));
       document.getElementById('play-mode-button').setAttribute('aria-current', String(playing ? 'page' : 'false'));
@@ -2207,9 +2204,6 @@
       renderBoard();
       renderPracticeInfo();
     });
-    document.getElementById('train-mode-button').addEventListener('click', () => setAppMode('train'));
-    document.getElementById('openings-mode-button').addEventListener('click', () => setAppMode('openings'));
-    document.getElementById('play-mode-button').addEventListener('click', () => setAppMode('play'));
     document.getElementById('analyze-game-button').addEventListener('click', () => {
       analysisOpen = !analysisOpen;
       renderGameAnalysis();
